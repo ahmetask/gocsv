@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ahmetask/gocsv"
@@ -15,7 +16,7 @@ type MyStruct struct {
 
 type Model struct {
 	A []string
-	B int
+	B *int
 	C float64
 	D MyStruct
 }
@@ -47,7 +48,8 @@ func main() {
 			for r := range readChannel {
 				if r.Exist() {
 					if v, ok := r.Value().(*Model); ok {
-						fmt.Println(v)
+						marshal, _ := json.Marshal(v)
+						fmt.Println(string(marshal))
 					}
 				} else {
 					fmt.Println(r.Err())

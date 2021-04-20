@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ahmetask/gocsv"
@@ -50,7 +51,8 @@ func main() {
 			for r := range readChannel {
 				if r.Exist() {
 					if v, ok := r.Value().(*Model); ok {
-						fmt.Println(v)
+						marshal, _ := json.Marshal(v)
+						fmt.Println(string(marshal))
 					}
 				} else {
 					fmt.Println(r.Err())
