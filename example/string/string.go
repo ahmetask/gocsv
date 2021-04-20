@@ -16,10 +16,20 @@ type MyStruct struct {
 
 type Model struct {
 	F1 []string
-	F2 *int
-	F3 *float64
-	F4 *string
-	F5 *MyStruct
+	F2 int
+	F3 *int
+	F4 int64
+	F5 *int64
+	F6 uint64
+	F7 *uint64
+	F8 string
+	F9 *string
+	F10 MyStruct
+	F11 *MyStruct
+	F12 *bool
+	F13 bool
+	F14 *float64
+	F16 float64
 }
 
 func convertField(v string, k reflect.Kind, t reflect.Type) (interface{}, error) {

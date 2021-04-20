@@ -2,7 +2,8 @@
 
 ```go
 type AnyStruct struct {
-	
+	F1 *string
+	//...
 }
 type MyStruct struct {
 	F1 []string
@@ -15,5 +16,10 @@ type MyStruct struct {
 	F8 string
 	F9 *string
 	F10 AnyStruct
+	F11 *AnyStruct
+	F12 *bool
+	F13 bool
+	F14 *float64
+	F16 float64
 }
 ```
