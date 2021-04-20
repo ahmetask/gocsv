@@ -20,14 +20,16 @@ type Model struct {
 }
 
 func convertField(v string, k reflect.Kind, t reflect.Type) (interface{}, error) {
-	return nil, errors.New("error data:" + v + "-k:" + k.String() + "-t:" + t.String())
+	return nil, errors.New(fmt.Sprintf("convertError data:%v kind:%v type:%v", v, k.String(), t.String()))
 }
 
 func main() {
 	reader, err := gocsv.NewReader(gocsv.ReaderConfig{
-		FilePath:       "./example/string/string.txt",
-		ProducerBuffer: 100,
-	}, Model{}, convertField)
+		FilePath:        "./example/string/string.csv",
+		ProducerBuffer:  100,
+		Format:          Model{},
+		ConvertFunction: convertField,
+	})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -44,7 +46,7 @@ func main() {
 			for r := range readChannel {
 				if r.Exist() {
 					if v, ok := r.Value().(*Model); ok {
-						v.B = 1
+						fmt.Println(v)
 					}
 				} else {
 					fmt.Println(r.Err())

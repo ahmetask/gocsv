@@ -25,13 +25,15 @@ type Model struct {
 }
 
 func convertField(v string, k reflect.Kind, t reflect.Type) (interface{}, error) {
-	return nil, errors.New("error data:" + v + "-k:" + k.String() + "-t:" + t.String())
+	return nil, errors.New(fmt.Sprintf("convertError data:%v kind:%v type:%v", v, k.String(), t.String()))
 }
 
 func main() {
 	reader, err := gocsv.NewReader(gocsv.ReaderConfig{
-		FilePath: "./example/json/json.csv",
-	}, Model{}, convertField)
+		FilePath:        "./example/json/json.csv",
+		Format:          Model{},
+		ConvertFunction: convertField,
+	})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -61,5 +63,4 @@ func main() {
 	wg.Wait()
 	_ = reader.Close()
 	fmt.Println("end:" + time.Now().String())
-
 }

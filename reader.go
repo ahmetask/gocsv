@@ -20,7 +20,6 @@ type Reader interface {
 type reader struct {
 	fp *os.File
 	ReaderConfig
-	format    interface{}
 	converter converter
 	pool      *worker.Pool
 }
@@ -32,7 +31,9 @@ type ReaderConfig struct {
 	Separator       string //Default " "
 	ProducerBuffer  int    //Default 100
 	producerChannel chan OptionalRowData
-	workerCount     int
+	WorkerCount     int
+	Format          interface{}
+	ConvertFunction ConvertField
 }
 
 func (r *ReaderConfig) Validate() error {
@@ -56,28 +57,27 @@ func (r *ReaderConfig) Validate() error {
 		r.ChunkSize = 100
 	}
 
-	if r.workerCount == 0 {
-		r.workerCount = 8
+	if r.WorkerCount == 0 {
+		r.WorkerCount = 8
 	}
 	return nil
 }
 
-func NewReader(config ReaderConfig, format interface{}, f ConvertField) (Reader, error) {
+func NewReader(config ReaderConfig) (Reader, error) {
 	err := config.Validate()
 	if err != nil {
 		return nil, err
 	}
-	pool := worker.NewWorkerPool(config.workerCount, 100)
+	pool := worker.NewWorkerPool(config.WorkerCount, 100)
 	pool.Start()
 
-	c , err := newConverter(format, f)
+	c, err := newConverter(config.Format, config.ConvertFunction)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	return &reader{
 		ReaderConfig: config,
-		format:       format,
-		converter:   c,
+		converter:    c,
 		pool:         pool,
 	}, nil
 }
