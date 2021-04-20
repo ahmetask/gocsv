@@ -9,14 +9,15 @@ import (
 	"time"
 )
 
-type A struct {
+type MyStruct struct {
 	X string
 }
+
 type Model struct {
 	A []string
 	B int
 	C float64
-	D A
+	D MyStruct
 }
 
 func convertField(v string, k reflect.Kind, t reflect.Type) (interface{}, error) {
