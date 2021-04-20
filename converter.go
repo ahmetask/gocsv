@@ -66,10 +66,10 @@ func (c *structConverter) convert(values []string) (interface{}, error) {
 				field := data.Elem().FieldByName(c.fieldNames[i])
 				value := reflect.ValueOf(typeOf)
 
-				if value.Kind() == reflect.Ptr {
+				if value.Kind() == reflect.Ptr && field.Kind() != reflect.Ptr {
 					value = value.Elem()
 					field.Set(value)
-				} else if field.Kind() == reflect.Ptr {
+				} else if field.Kind() == reflect.Ptr && value.Kind() != reflect.Ptr {
 					pointer := reflect.New(value.Type())
 					pointer.Elem().Set(value)
 					field.Set(pointer)

@@ -11,14 +11,15 @@ import (
 )
 
 type MyStruct struct {
-	X string
+	F1 *string
 }
 
 type Model struct {
-	A []string
-	B *int
-	C float64
-	D MyStruct
+	F1 []string
+	F2 *int
+	F3 *float64
+	F4 *string
+	F5 *MyStruct
 }
 
 func convertField(v string, k reflect.Kind, t reflect.Type) (interface{}, error) {
