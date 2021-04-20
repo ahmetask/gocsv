@@ -29,6 +29,7 @@ type ReaderConfig struct {
 	ChunkSize       int    //Default
 	LineBuffer      int64  //Default
 	Separator       string //Default " "
+	StringSeparator string //Default ","
 	ProducerBuffer  int    //Default 100
 	producerChannel chan OptionalRowData
 	WorkerCount     int
@@ -71,7 +72,7 @@ func NewReader(config ReaderConfig) (Reader, error) {
 	pool := worker.NewWorkerPool(config.WorkerCount, 100)
 	pool.Start()
 
-	c, err := newConverter(config.Format, config.ConvertFunction)
+	c, err := newConverter(config.StringSeparator, config.Format, config.ConvertFunction)
 	if err != nil {
 		return nil, err
 	}

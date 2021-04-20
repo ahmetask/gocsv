@@ -16,15 +16,15 @@ type converter interface {
 }
 
 type structConverter struct {
-	format     interface{}
-	slice      string
-	cf         ConvertField
-	fieldKinds []reflect.Kind
-	fieldTypes []reflect.Type
-	fieldNames []string
+	format          interface{}
+	stringSeparator string
+	cf              ConvertField
+	fieldKinds      []reflect.Kind
+	fieldTypes      []reflect.Type
+	fieldNames      []string
 }
 
-func newConverter(format interface{}, cf ConvertField) (converter, error) {
+func newConverter(stringSeparator string, format interface{}, cf ConvertField) (converter, error) {
 	item := reflect.ValueOf(format)
 	if item.Kind() == reflect.Ptr {
 		item = item.Elem()
@@ -48,11 +48,12 @@ func newConverter(format interface{}, cf ConvertField) (converter, error) {
 		return nil, errors.New(fmt.Sprintf("invalid format:%v", format))
 	}
 	return &structConverter{
-		format:     format,
-		cf:         cf,
-		fieldKinds: fieldKinds,
-		fieldTypes: fieldTypes,
-		fieldNames: fieldNames,
+		format:          format,
+		cf:              cf,
+		fieldKinds:      fieldKinds,
+		fieldTypes:      fieldTypes,
+		fieldNames:      fieldNames,
+		stringSeparator: stringSeparator,
 	}, nil
 }
 
@@ -76,9 +77,6 @@ func (c *structConverter) convert(values []string) (interface{}, error) {
 				} else {
 					field.Set(value)
 				}
-
-			} else {
-				return nil, err
 			}
 		}
 	} else {
@@ -116,7 +114,7 @@ func (c *structConverter) typeof(v string, k reflect.Kind, t reflect.Type) (inte
 	case reflect.Slice:
 		var a []string
 		if reflect.TypeOf(a) == t {
-			return strings.Split(v, ","), nil
+			return strings.Split(v, c.stringSeparator), nil
 		}
 		return c.cf(v, k, t)
 	case reflect.Struct:

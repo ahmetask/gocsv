@@ -15,21 +15,21 @@ type MyStruct struct {
 }
 
 type Model struct {
-	F1 []string
-	F2 int
-	F3 *int
-	F4 int64
-	F5 *int64
-	F6 uint64
-	F7 *uint64
-	F8 string
-	F9 *string
+	F1  []string
+	F2  int
+	F3  *int
+	F4  int64
+	F5  *int64
+	F6  uint64
+	F7  *uint64
+	F8  string
+	F9  *string
 	F10 MyStruct
 	F11 *MyStruct
 	F12 *bool
 	F13 bool
 	F14 *float64
-	F16 float64
+	F15 float64
 }
 
 func convertField(v string, k reflect.Kind, t reflect.Type) (interface{}, error) {
@@ -40,6 +40,8 @@ func main() {
 	reader, err := gocsv.NewReader(gocsv.ReaderConfig{
 		FilePath:        "./example/string/string.csv",
 		ProducerBuffer:  100,
+		Separator:       ",",
+		StringSeparator: "-",
 		Format:          Model{},
 		ConvertFunction: convertField,
 	})
