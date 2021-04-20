@@ -50,6 +50,14 @@ func (r *ReaderConfig) Validate() error {
 		r.Separator = " "
 	}
 
+	if r.StringSeparator == "" {
+		r.StringSeparator = ","
+	}
+
+	if r.StringSeparator == r.Separator {
+		return errors.New("separator values should be different")
+	}
+
 	if r.LineBuffer == 0 {
 		r.LineBuffer = 250 * 1024
 	}
