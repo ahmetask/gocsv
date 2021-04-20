@@ -125,10 +125,10 @@ func (c *structConverter) typeof(v string, k reflect.Kind, t reflect.Type) (inte
 			return nil, err
 		}
 		return a, nil
+	case reflect.Ptr: {
+		return c.typeof(v, t.Elem().Kind(), t.Elem())
+	}
 	default:
-		if k == reflect.Ptr {
-			return c.typeof(v, t.Elem().Kind(), t.Elem())
-		}
 		if c.cf == nil {
 			return nil, errors.New("custom field converter is nil")
 		}
