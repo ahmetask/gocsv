@@ -69,10 +69,15 @@ func NewReader(config ReaderConfig, format interface{}, f ConvertField) (Reader,
 	}
 	pool := worker.NewWorkerPool(config.workerCount, 100)
 	pool.Start()
+
+	c , err := newConverter(format, f)
+	if err != nil {
+		return nil,err
+	}
 	return &reader{
 		ReaderConfig: config,
 		format:       format,
-		converter:    newConverter(format, f),
+		converter:   c,
 		pool:         pool,
 	}, nil
 }

@@ -9,12 +9,19 @@ import (
 	"time"
 )
 
-type A struct {
+type MyStruct2 struct {
+	Y string
+}
+
+type MyStruct1 struct {
 	X string
 	T int
 }
+
+// Model add your structures in the order found in the csv. Json text can not contains your separator text and "\n"
 type Model struct {
-	A
+	MyStruct1
+	MyStruct2
 }
 
 func convertField(v string, k reflect.Kind, t reflect.Type) (interface{}, error) {
@@ -23,7 +30,7 @@ func convertField(v string, k reflect.Kind, t reflect.Type) (interface{}, error)
 
 func main() {
 	reader, err := gocsv.NewReader(gocsv.ReaderConfig{
-		FilePath: "./example/json/json.txt",
+		FilePath: "./example/json/json.csv",
 	}, Model{}, convertField)
 	if err != nil {
 		fmt.Println(err)
@@ -41,7 +48,7 @@ func main() {
 			for r := range readChannel {
 				if r.Exist() {
 					if v, ok := r.Value().(*Model); ok {
-						v.T = 1
+						fmt.Println(v)
 					}
 				} else {
 					fmt.Println(r.Err())

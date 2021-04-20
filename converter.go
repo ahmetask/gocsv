@@ -16,20 +16,16 @@ type converter interface {
 }
 
 type structConverter struct {
-	format interface{}
-	slice  string
-	cf     ConvertField
+	format     interface{}
+	slice      string
+	cf         ConvertField
+	fieldKinds []reflect.Kind
+	fieldTypes []reflect.Type
+	fieldNames []string
 }
 
-func newConverter(format interface{}, cf ConvertField) converter {
-	return &structConverter{
-		format: format,
-		cf:     cf,
-	}
-}
-
-func (c *structConverter) convert(values []string) (interface{}, error) {
-	item := reflect.ValueOf(c.format)
+func newConverter(format interface{}, cf ConvertField) (converter, error) {
+	item := reflect.ValueOf(format)
 	if item.Kind() == reflect.Ptr {
 		item = item.Elem()
 	}
@@ -38,27 +34,36 @@ func (c *structConverter) convert(values []string) (interface{}, error) {
 	}
 	var fieldKinds []reflect.Kind
 	var fieldTypes []reflect.Type
+	var fieldNames []string
+
 	for i := 0; i < item.NumField(); i++ {
 		kind := item.Field(i).Kind()
 		t := item.Field(i).Type()
 		fieldKinds = append(fieldKinds, kind)
 		fieldTypes = append(fieldTypes, t)
+		fieldNames = append(fieldNames, item.Type().Field(i).Name)
 	}
 
-	var fieldNames []string
-
-	val := reflect.Indirect(item)
-	for i := 0; i < item.NumField(); i++ {
-		fieldNames = append(fieldNames, val.Type().Field(i).Name)
+	if fieldNames == nil || fieldTypes == nil || fieldKinds == nil {
+		return nil, errors.New(fmt.Sprintf("invalid format:%v", format))
 	}
+	return &structConverter{
+		format:     format,
+		cf:         cf,
+		fieldKinds: fieldKinds,
+		fieldTypes: fieldTypes,
+		fieldNames: fieldNames,
+	}, nil
+}
+
+func (c *structConverter) convert(values []string) (interface{}, error) {
 
 	var data = reflect.New(reflect.TypeOf(c.format))
-
-	if len(fieldKinds) == len(values) && fieldKinds != nil && fieldNames != nil && fieldTypes != nil && data.Kind() == reflect.Ptr {
+	if data.Kind() == reflect.Ptr {
 		for i, v := range values {
-			typeOf, err := c.typeof(v, fieldKinds[i], fieldTypes[i])
+			typeOf, err := c.typeof(v, c.fieldKinds[i], c.fieldTypes[i])
 			if err == nil && typeOf != nil {
-				field := data.Elem().FieldByName(fieldNames[i])
+				field := data.Elem().FieldByName(c.fieldNames[i])
 				value := reflect.ValueOf(typeOf)
 
 				if value.Kind() == reflect.Ptr {
