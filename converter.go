@@ -79,6 +79,8 @@ func (c *structConverter) convert(values []string) (interface{}, error) {
 				} else {
 					field.Set(value)
 				}
+			} else if err != nil {
+				return nil, err
 			}
 		}
 		if !init {
@@ -132,9 +134,7 @@ func (c *structConverter) typeof(v string, k reflect.Kind, t reflect.Type) (inte
 		}
 		return a, nil
 	case reflect.Ptr:
-		{
-			return c.typeof(v, t.Elem().Kind(), t.Elem())
-		}
+		return c.typeof(v, t.Elem().Kind(), t.Elem())
 	default:
 		if c.cf == nil {
 			return nil, errors.New("custom field converter is nil")
