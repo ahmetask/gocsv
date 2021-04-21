@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/ahmetask/gocsv"
@@ -49,14 +48,11 @@ func main() {
 	for i := 0; i < 10; i++ {
 		go func(w *sync.WaitGroup) {
 			for r := range readChannel {
-				if r.Exist() {
-					if v, ok := r.Value().(*Model); ok {
-						marshal, _ := json.Marshal(v)
-						fmt.Println(string(marshal))
-					}
-				} else {
-					fmt.Println(r.Err())
-				}
+				x := r.OrElse(func(err error) interface{} {
+					return err
+				})
+
+				fmt.Println(x)
 			}
 			w.Done()
 		}(wg)

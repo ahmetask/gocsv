@@ -60,10 +60,12 @@ func newConverter(stringSeparator string, format interface{}, cf ConvertField) (
 func (c *structConverter) convert(values []string) (interface{}, error) {
 
 	var data = reflect.New(reflect.TypeOf(c.format))
+	init := false
 	if data.Kind() == reflect.Ptr {
 		for i, v := range values {
 			typeOf, err := c.typeof(v, c.fieldKinds[i], c.fieldTypes[i])
 			if err == nil && typeOf != nil {
+				init = true
 				field := data.Elem().FieldByName(c.fieldNames[i])
 				value := reflect.ValueOf(typeOf)
 
@@ -78,6 +80,10 @@ func (c *structConverter) convert(values []string) (interface{}, error) {
 					field.Set(value)
 				}
 			}
+		}
+		if !init {
+			return nil, errors.New(fmt.Sprintf("invalid data:%v", strings.Join(values, " ")))
+
 		}
 	} else {
 		return nil, errors.New(fmt.Sprintf("invalid field configuration data:%v", strings.Join(values, " ")))
@@ -125,9 +131,10 @@ func (c *structConverter) typeof(v string, k reflect.Kind, t reflect.Type) (inte
 			return nil, err
 		}
 		return a, nil
-	case reflect.Ptr: {
-		return c.typeof(v, t.Elem().Kind(), t.Elem())
-	}
+	case reflect.Ptr:
+		{
+			return c.typeof(v, t.Elem().Kind(), t.Elem())
+		}
 	default:
 		if c.cf == nil {
 			return nil, errors.New("custom field converter is nil")
